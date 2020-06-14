@@ -12,7 +12,6 @@ import java.io.ObjectInputStream;
 /**
  * @author zy-user
  */
-@ChannelHandler.Sharable
 public class NettyDecoder extends LengthFieldBasedFrameDecoder {
 
     public NettyDecoder() {

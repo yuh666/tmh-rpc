@@ -12,7 +12,7 @@ public class RpcProxy implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         RpcRequest rpcRequest = new RpcRequest();
-        rpcRequest.setInterfaceName(method.getClass().getName());
+        rpcRequest.setInterfaceName(method.getDeclaringClass().getName());
         rpcRequest.setMethodCode(method.getAnnotation(RpcMember.class).value());
         rpcRequest.setArgs(args);
         //暂时写死地址

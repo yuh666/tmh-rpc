@@ -13,7 +13,6 @@ import java.io.ObjectOutputStream;
  * @author zy-user
  * 增加长度标识 解决粘包分包问题
  */
-@ChannelHandler.Sharable
 public class NettyEncoder extends MessageToByteEncoder<RpcRequest> {
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcRequest msg, ByteBuf out) throws Exception {

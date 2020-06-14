@@ -8,6 +8,7 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
+import show.tmh.rpc.client.netty.NettyExceptionHandler;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
@@ -30,8 +31,7 @@ public class NettyServer {
     public NettyServer(String host, int port) {
         this.host = host;
         this.port = port;
-        NettyEncoder nettyEncoder = new NettyEncoder();
-        NettyDecoder nettyDecoder = new NettyDecoder();
+        NettyExceptionHandler exceptionHandler = new NettyExceptionHandler();
         NettyServerHandler nettyServerHandler = new NettyServerHandler();
         this.bootstrap.group(this.bossGroup, this.workerGroup)
                 .channel(NioServerSocketChannel.class)
@@ -44,9 +44,10 @@ public class NettyServer {
                     public void initChannel(SocketChannel ch) throws Exception {
                         ch.pipeline()
                                 .addLast(
-                                        nettyEncoder,
-                                        nettyDecoder,
-                                        nettyServerHandler
+                                        new NettyEncoder(),
+                                        new NettyDecoder(),
+                                        nettyServerHandler,
+                                        exceptionHandler
                                 );
                     }
                 });

@@ -51,5 +51,6 @@ public class ServerRegistry {
                 methodHandleMap.put(annotation.value(), method);
             }
         }
+        instanceRegistryMap.put(classInterface.getName(), instance);
     }
 }

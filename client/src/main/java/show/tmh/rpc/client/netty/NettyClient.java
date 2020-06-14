@@ -24,9 +24,8 @@ public class NettyClient {
     public static NettyClient INSTANCE = new NettyClient();
 
     private NettyClient() {
-        NettyEncoder nettyEncoder = new NettyEncoder();
-        NettyDecoder nettyDecoder = new NettyDecoder();
         NettyClientHandler handler = new NettyClientHandler();
+        NettyExceptionHandler exceptionHandler = new NettyExceptionHandler();
         this.bootstrap.group(this.eventLoopGroupWorker).channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -34,9 +33,10 @@ public class NettyClient {
                     public void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(
-                                nettyEncoder,
-                                nettyDecoder,
-                                handler);
+                                new NettyEncoder(),
+                                new NettyDecoder(),
+                                handler,
+                                exceptionHandler);
                     }
                 });
     }
@@ -44,8 +44,18 @@ public class NettyClient {
     public void invoke(String host, int port, Object param) throws ExecutionException, InterruptedException {
         String channelKey = host + ":" + port;
         Channel channel = channelTables.computeIfAbsent(channelKey, (key)
-                -> bootstrap.connect(new InetSocketAddress(host, port)).channel()
+                        -> {
+                    try {
+                        return bootstrap.connect(new InetSocketAddress(host, port)).sync().channel();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    return null;
+                }
         );
+        if (channel == null) {
+            throw new RuntimeException("cannot create channel");
+        }
         channel.writeAndFlush(param);
     }
 

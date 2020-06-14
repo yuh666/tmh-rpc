@@ -9,6 +9,6 @@ import java.lang.reflect.Proxy;
 public class RpcFactory {
 
     public static <T> T create(Class<T> clazz) {
-        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), clazz.getInterfaces(), new RpcProxy());
+        return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, new RpcProxy());
     }
 }
