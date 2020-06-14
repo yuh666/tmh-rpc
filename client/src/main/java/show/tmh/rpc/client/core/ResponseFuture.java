@@ -1,14 +1,16 @@
 package show.tmh.rpc.client.core;
 
+import show.tmh.rpc.client.protocol.RpcResponse;
+
 import java.util.concurrent.*;
 
 /**
  * @author zy-user
  */
-public class ResponseFuture<T> implements Future<T> {
+public class ResponseFuture implements Future {
 
     private CountDownLatch latch = new CountDownLatch(1);
-    private volatile T result;
+    private volatile RpcResponse response;
     private volatile boolean done;
 
 
@@ -27,21 +29,26 @@ public class ResponseFuture<T> implements Future<T> {
         return done;
     }
 
-    public void done(T result) {
-        this.result = result;
+    public void done(RpcResponse response) {
+        this.response = response;
         this.done = true;
         latch.countDown();
     }
 
     @Override
-    public T get() throws InterruptedException, ExecutionException {
+    public Object get() throws InterruptedException, ExecutionException {
         latch.await();
-        return result;
+        if (response.getThrowable() != null) {
+            throw new ExecutionException(response.getThrowable());
+        }
+        return response.getResult();
     }
 
     @Override
-    public T get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-        latch.await(timeout, unit);
-        return result;
+    public Object get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
+        if (response.getThrowable() != null) {
+            throw new ExecutionException(response.getThrowable());
+        }
+        return response.getResult();
     }
 }
