@@ -1,6 +1,7 @@
 package show.tmh.rpc.demo.main;
 
 import show.tmh.rpc.client.core.RpcFactory;
+import show.tmh.rpc.demo.User;
 import show.tmh.rpc.demo.UserService;
 
 import java.util.concurrent.CountDownLatch;

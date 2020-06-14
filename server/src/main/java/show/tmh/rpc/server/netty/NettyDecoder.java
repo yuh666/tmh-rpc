@@ -1,10 +1,15 @@
 package show.tmh.rpc.server.netty;
 
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import show.tmh.rpc.client.protocol.RpcRequest;
+import show.tmh.rpc.client.protocol.RpcResponse;
+import show.tmh.rpc.client.util.ThreadLocalKryo;
 
 import java.io.ByteArrayInputStream;
 import java.io.ObjectInputStream;
@@ -28,8 +33,8 @@ public class NettyDecoder extends LengthFieldBasedFrameDecoder {
             int len = byteBuf.readInt();
             byte[] bytes = new byte[len];
             byteBuf.readBytes(bytes);
-            ObjectInputStream objectInputStream = new ObjectInputStream(new ByteArrayInputStream(bytes));
-            return objectInputStream.readObject();
+            Input input = new Input(new ByteArrayInputStream(bytes));
+            return ThreadLocalKryo.kryo.get().readObject(input, RpcRequest.class);
         } finally {
             byteBuf.release();
         }
