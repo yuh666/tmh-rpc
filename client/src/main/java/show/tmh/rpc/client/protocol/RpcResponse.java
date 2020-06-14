@@ -7,5 +7,6 @@ public class RpcResponse {
 
     private Long responseId;
     private Object result;
+    private Throwable throwable;
 
 }
