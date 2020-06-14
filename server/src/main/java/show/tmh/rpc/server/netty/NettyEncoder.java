@@ -2,6 +2,7 @@ package show.tmh.rpc.server.netty;
 
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import show.tmh.rpc.client.protocol.RpcResponse;
@@ -13,6 +14,7 @@ import java.io.ObjectOutputStream;
  * @author zy-user
  * 增加长度标识 解决粘包分包问题
  */
+@ChannelHandler.Sharable
 public class NettyEncoder extends MessageToByteEncoder<RpcResponse> {
     @Override
     protected void encode(ChannelHandlerContext ctx, RpcResponse msg, ByteBuf out) throws Exception {

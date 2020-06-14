@@ -2,6 +2,7 @@ package show.tmh.rpc.client.netty;
 
 
 import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 
@@ -12,6 +13,7 @@ import java.util.List;
 /**
  * @author zy-user
  */
+@ChannelHandler.Sharable
 public class NettyDecoder extends LengthFieldBasedFrameDecoder {
 
     public NettyDecoder() {

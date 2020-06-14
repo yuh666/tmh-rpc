@@ -8,6 +8,7 @@ import show.tmh.rpc.client.protocol.RpcRequest;
 import show.tmh.rpc.client.protocol.RpcResponse;
 
 import java.lang.invoke.MethodHandle;
+import java.lang.reflect.Method;
 
 /**
  * @author zy-user
@@ -23,7 +24,7 @@ public class RpcTask implements Runnable {
 
     @Override
     public void run() {
-        MethodHandle methodHandle =
+        Method methodHandle =
                 ServerRegistry.INSTANCE.getMethod(request.getInterfaceName(), request.getMethodCode());
         RpcResponse rpcResponse = new RpcResponse();
         rpcResponse.setResponseId(request.getRequestId());

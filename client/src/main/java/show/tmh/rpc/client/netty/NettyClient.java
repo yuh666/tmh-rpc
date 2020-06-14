@@ -18,12 +18,15 @@ import java.util.concurrent.ExecutionException;
 public class NettyClient {
 
     private final Bootstrap bootstrap = new Bootstrap();
-    private final EventLoopGroup eventLoopGroupWorker = new NioEventLoopGroup(Runtime.getRuntime().availableProcessors() * 2);
+    private final EventLoopGroup eventLoopGroupWorker = new NioEventLoopGroup(2);
     private final ConcurrentMap<String, Channel> channelTables = new ConcurrentHashMap<>();
 
     public static NettyClient INSTANCE = new NettyClient();
 
     private NettyClient() {
+        NettyEncoder nettyEncoder = new NettyEncoder();
+        NettyDecoder nettyDecoder = new NettyDecoder();
+        NettyClientHandler handler = new NettyClientHandler();
         this.bootstrap.group(this.eventLoopGroupWorker).channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
                 .handler(new ChannelInitializer<SocketChannel>() {
@@ -31,9 +34,9 @@ public class NettyClient {
                     public void initChannel(SocketChannel ch) throws Exception {
                         ChannelPipeline pipeline = ch.pipeline();
                         pipeline.addLast(
-                                new NettyEncoder(),
-                                new NettyDecoder(),
-                                new NettyClientHandler());
+                                nettyEncoder,
+                                nettyDecoder,
+                                handler);
                     }
                 });
     }
