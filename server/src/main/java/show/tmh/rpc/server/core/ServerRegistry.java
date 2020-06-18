@@ -7,6 +7,7 @@ import java.lang.invoke.MethodHandle;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author zy-user
@@ -52,5 +53,9 @@ public class ServerRegistry {
             }
         }
         instanceRegistryMap.put(classInterface.getName(), instance);
+    }
+
+    public Set<String> getRegistryInterfaces(){
+        return instanceRegistryMap.keySet();
     }
 }

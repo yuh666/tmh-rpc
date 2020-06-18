@@ -41,12 +41,13 @@ public class NettyClient {
                 });
     }
 
-    public void invoke(String host, int port, Object param) throws ExecutionException, InterruptedException {
-        String channelKey = host + ":" + port;
-        Channel channel = channelTables.computeIfAbsent(channelKey, (key)
+    public void invoke(String addr, Object param) throws ExecutionException, InterruptedException {
+        Channel channel = channelTables.computeIfAbsent(addr, (key)
                         -> {
                     try {
-                        return bootstrap.connect(new InetSocketAddress(host, port)).sync().channel();
+                        String[] split = addr.split(":");
+                        return bootstrap.connect(new InetSocketAddress(split[0],
+                                Integer.parseInt(split[1]))).sync().channel();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

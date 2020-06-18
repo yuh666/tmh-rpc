@@ -56,14 +56,15 @@ public class NettyServer {
 
     public void start() {
         try {
-            ChannelFuture sync = this.bootstrap.bind(new InetSocketAddress(host, port)).sync();
-            sync.channel().closeFuture().sync();
-        } catch (InterruptedException e1) {
-            throw new RuntimeException("this.serverBootstrap.bind().sync() InterruptedException", e1);
-        } finally {
-            this.bossGroup.shutdownGracefully();
-            this.workerGroup.shutdownGracefully();
+            this.bootstrap.bind(new InetSocketAddress(host, port)).sync();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+    }
+
+    public void shutdown() {
+        this.bossGroup.shutdownGracefully();
+        this.workerGroup.shutdownGracefully();
     }
 
 }

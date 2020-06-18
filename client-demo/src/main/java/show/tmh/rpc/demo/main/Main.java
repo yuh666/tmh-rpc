@@ -12,6 +12,7 @@ import java.util.concurrent.TimeUnit;
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
+        RpcFactory.init("106.12.15.56:2181");
         UserService userService = RpcFactory.create(UserService.class, 3, TimeUnit.SECONDS);
         CountDownLatch countDownLatch = new CountDownLatch(10);
         long l = System.currentTimeMillis();

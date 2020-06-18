@@ -1,4 +1,4 @@
-package show.tmh.rpc.client.util;
+package show.tmh.rpc.client.core;
 
 import com.esotericsoftware.kryo.Kryo;
 import show.tmh.rpc.client.protocol.RpcRequest;
