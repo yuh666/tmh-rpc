@@ -36,16 +36,16 @@ public class ResponseFuture implements Future {
     }
 
     @Override
-    public Object get() throws InterruptedException, ExecutionException {
+    public RpcResponse get() throws InterruptedException, ExecutionException {
         latch.await();
         if (response.getThrowable() != null) {
             throw new ExecutionException(response.getThrowable());
         }
-        return response.getResult();
+        return response;
     }
 
     @Override
-    public Object get(long timeout,
+    public RpcResponse get(long timeout,
             TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
         latch.await(timeout, unit);
         if (latch.getCount() == 1) {
@@ -54,6 +54,6 @@ public class ResponseFuture implements Future {
         if (response.getThrowable() != null) {
             throw new ExecutionException(response.getThrowable());
         }
-        return response.getResult();
+        return response;
     }
 }

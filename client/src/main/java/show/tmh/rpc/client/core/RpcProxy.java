@@ -3,6 +3,7 @@ package show.tmh.rpc.client.core;
 import show.tmh.rpc.client.annotation.RpcMember;
 import show.tmh.rpc.client.netty.NettyClient;
 import show.tmh.rpc.client.protocol.RpcRequest;
+import show.tmh.rpc.client.protocol.RpcResponse;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -29,11 +30,17 @@ public class RpcProxy implements InvocationHandler {
         rpcRequest.setExpectTimeOut(timeoutInMills);
         ResponseFuture future = FutureCollection.INSTANCE.register(rpcRequest.getRequestId());
         String addr = registryCache.chooseAddr(interfaceName);
+        long start = System.currentTimeMillis();
         NettyClient.INSTANCE.invoke(addr, rpcRequest);
+        RpcResponse response;
         if (timeoutInMills > 0) {
-            return future.get(timeoutInMills, TimeUnit.MILLISECONDS);
+            response = future.get(timeoutInMills, TimeUnit.MILLISECONDS);
         } else {
-            return future.get();
+            response = future.get();
         }
+        long latency = System.currentTimeMillis() - start;
+        //TODO 处理latency和responseCode
+
+        return response.getResult();
     }
 }
