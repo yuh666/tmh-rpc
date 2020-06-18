@@ -24,7 +24,8 @@ public class FutureCollection {
     }
 
     public ResponseFuture get(Long id) {
-        return respTable.get(id);
+        return respTable.remove(id);
     }
+
 
 }
