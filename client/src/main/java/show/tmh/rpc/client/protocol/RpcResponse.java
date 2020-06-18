@@ -11,7 +11,7 @@ public class RpcResponse implements Serializable {
     /**
      * 响应码
      * 0.正常
-     * 1.重启
+     * 1.关机
      * 2.压力过大
      */
     private Byte responseCode = 0;

@@ -28,6 +28,7 @@ public class NettyClient {
         NettyExceptionHandler exceptionHandler = new NettyExceptionHandler();
         this.bootstrap.group(this.eventLoopGroupWorker).channel(NioSocketChannel.class)
                 .option(ChannelOption.TCP_NODELAY, true)
+                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 1000)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
                     public void initChannel(SocketChannel ch) throws Exception {
@@ -42,21 +43,19 @@ public class NettyClient {
     }
 
     public void invoke(String addr, Object param) throws ExecutionException, InterruptedException {
-        Channel channel = channelTables.computeIfAbsent(addr, (key)
-                        -> {
-                    try {
-                        String[] split = addr.split(":");
-                        return bootstrap.connect(new InetSocketAddress(split[0],
-                                Integer.parseInt(split[1]))).sync().channel();
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    return null;
+        Channel channel = channelTables.get(addr);
+        if (channel == null || !channel.isOpen()) {
+            synchronized (addr.intern()) {
+                String[] split = addr.split(":");
+                channel = channelTables.get(addr);
+                if (channel == null || !channel.isOpen()) {
+                    channel = bootstrap.connect(new InetSocketAddress(split[0],
+                            Integer.parseInt(split[1]))).sync().channel();
+                    channelTables.put(addr, channel);
                 }
-        );
-        if (channel == null) {
-            throw new RuntimeException("cannot create channel");
+            }
         }
+        System.err.println("to: " + addr);
         channel.writeAndFlush(param);
     }
 

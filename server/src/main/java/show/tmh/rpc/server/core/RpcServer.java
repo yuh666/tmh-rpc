@@ -7,6 +7,7 @@ import java.util.Set;
 
 public class RpcServer {
 
+    private static volatile boolean running;
     private NettyServer nettyServer;
     private RpcRegistry registry;
     private String host;
@@ -24,7 +25,9 @@ public class RpcServer {
         ServerRegistry.INSTANCE.register(instance);
     }
 
+
     public void start() {
+        running = true;
         nettyServer.start();
         registry.start();
         Set<String> registryAddrs = ServerRegistry.INSTANCE.getRegistryInterfaces();
@@ -36,6 +39,29 @@ public class RpcServer {
                 e.printStackTrace();
             }
         });
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> RpcServer.this.shutdown()));
     }
 
+    public void shutdown() {
+        running = false;
+        Set<String> registryAddrs = ServerRegistry.INSTANCE.getRegistryInterfaces();
+        registryAddrs.forEach(inter -> {
+            try {
+                registry.removeProvider(inter, host + ":" + port);
+                System.out.println("remove interface: " + inter + " addr: " + host + ":" + port);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        this.nettyServer.shutdown();
+    }
+
+    public static boolean isRunning() {
+        return running;
+    }
 }

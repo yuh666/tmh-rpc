@@ -13,17 +13,21 @@ public class Main {
 
     public static void main(String[] args) throws InterruptedException {
         RpcFactory.init("106.12.15.56:2181");
-        UserService userService = RpcFactory.create(UserService.class, 3, TimeUnit.SECONDS);
+        UserService userService = RpcFactory.create(UserService.class, 100, TimeUnit.SECONDS);
         CountDownLatch countDownLatch = new CountDownLatch(10);
         long l = System.currentTimeMillis();
         ExecutorService executorService = Executors.newFixedThreadPool(10);
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 2; i++) {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    for (int j = 0; j < 10; j++) {
+                    for (int j = 0; j < 100000; j++) {
                         User user = userService.get(1L);
-                        System.out.println(user);
+                        try {
+                            Thread.sleep(100);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
                     }
                     countDownLatch.countDown();
                 }

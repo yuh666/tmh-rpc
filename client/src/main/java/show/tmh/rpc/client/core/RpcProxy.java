@@ -22,25 +22,33 @@ public class RpcProxy implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+        long begin = System.currentTimeMillis();
         RpcRequest rpcRequest = new RpcRequest();
         String interfaceName = method.getDeclaringClass().getName();
         rpcRequest.setInterfaceName(interfaceName);
         rpcRequest.setMethodCode(method.getAnnotation(RpcMember.class).value());
         rpcRequest.setArgs(args);
-        rpcRequest.setExpectTimeOut(timeoutInMills);
         ResponseFuture future = FutureCollection.INSTANCE.register(rpcRequest.getRequestId());
-        String addr = registryCache.chooseAddr(interfaceName);
-        long start = System.currentTimeMillis();
-        NettyClient.INSTANCE.invoke(addr, rpcRequest);
-        RpcResponse response;
-        if (timeoutInMills > 0) {
-            response = future.get(timeoutInMills, TimeUnit.MILLISECONDS);
-        } else {
-            response = future.get();
+        while (System.currentTimeMillis() - begin < timeoutInMills) {
+            String addr = registryCache.chooseAddr(interfaceName);
+            long restTime = timeoutInMills - ((System.currentTimeMillis() - begin));
+            rpcRequest.setExpectTimeOut(restTime);
+            try {
+                NettyClient.INSTANCE.invoke(addr, rpcRequest);
+            } catch (Exception e) {
+                continue;
+            }
+            RpcResponse response;
+            if (timeoutInMills > 0) {
+                response = future.get(restTime, TimeUnit.MILLISECONDS);
+            } else {
+                response = future.get();
+            }
+            if (response.getResponseCode() == 1) {
+                registryCache.removeProvider(interfaceName, addr);
+            }
+            return response.getResult();
         }
-        long latency = System.currentTimeMillis() - start;
-        //TODO 处理latency和responseCode
-
-        return response.getResult();
+        throw new RuntimeException("timeout");
     }
 }
