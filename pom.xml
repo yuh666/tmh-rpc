@@ -10,8 +10,8 @@
     <modules>
         <module>client</module>
         <module>server</module>
-        <module>client-show.tmh.rpc.demo</module>
-        <module>server-show.tmh.rpc.demo</module>
+        <module>client-demo</module>
+        <module>server-demo</module>
     </modules>
     <packaging>pom</packaging>
 

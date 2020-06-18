@@ -7,11 +7,12 @@ import show.tmh.rpc.demo.UserService;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class Main {
 
     public static void main(String[] args) throws InterruptedException {
-        UserService userService = RpcFactory.create(UserService.class);
+        UserService userService = RpcFactory.create(UserService.class, 3, TimeUnit.SECONDS);
         CountDownLatch countDownLatch = new CountDownLatch(10);
         long l = System.currentTimeMillis();
         ExecutorService executorService = Executors.newFixedThreadPool(10);
@@ -19,8 +20,9 @@ public class Main {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    for (int j = 0; j < 100000; j++) {
-                        userService.get(1L);
+                    for (int j = 0; j < 10; j++) {
+                        User user = userService.get(1L);
+                        System.out.println(user);
                     }
                     countDownLatch.countDown();
                 }

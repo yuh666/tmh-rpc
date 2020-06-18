@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>client-show.tmh.rpc.demo</artifactId>
+    <artifactId>client-demo</artifactId>
 
     <dependencies>
         <dependency>

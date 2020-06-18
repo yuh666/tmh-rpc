@@ -53,6 +53,10 @@ public class RpcTask implements Runnable {
             throwable.printStackTrace();
             rpcResponse.setThrowable(throwable);
         }
+        if (System.currentTimeMillis() - addTime > request.getExpectTimeOut()) {
+            //超时 直接丢弃
+            return;
+        }
         ctx.channel().writeAndFlush(rpcResponse);
     }
 }
