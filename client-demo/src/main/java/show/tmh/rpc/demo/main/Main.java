@@ -17,7 +17,7 @@ public class Main {
         CountDownLatch countDownLatch = new CountDownLatch(10);
         long l = System.currentTimeMillis();
         ExecutorService executorService = Executors.newFixedThreadPool(10);
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 10; i++) {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {

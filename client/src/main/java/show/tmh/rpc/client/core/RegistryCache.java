@@ -27,54 +27,41 @@ public class RegistryCache {
 
 
     public String chooseAddr(String interfaceName) {
-        rwLock.readLock().lock();
+        rwLock.writeLock().lock();
         try {
             List<String> addrList = cacheMap.get(interfaceName);
             if (addrList == null || addrList.isEmpty()) {
-                rwLock.readLock().unlock();
-                rwLock.writeLock().lock();
-                addrList = cacheMap.get(interfaceName);
-                try {
-                    if (addrList == null || addrList.isEmpty()) {
-                        List<String> provider = registry.getProvider(interfaceName);
-                        if (provider == null || provider.isEmpty()) {
-                            throw new RuntimeException("provider list is empty");
-                        }
-                        addrList = provider;
-                        cacheMap.put(interfaceName, provider);
-                        registry.watchInterface(interfaceName, event -> {
-                            rwLock.writeLock().lock();
-                            try {
-                                try {
-                                    cacheMap.put(interfaceName, registry.getProvider(interfaceName));
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            } finally {
-                                rwLock.writeLock().unlock();
-                            }
-                        });
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    throw new RuntimeException(e);
-                } finally {
-                    rwLock.writeLock().unlock();
+                List<String> provider = registry.getProvider(interfaceName);
+                if (provider == null || provider.isEmpty()) {
+                    throw new RuntimeException("provider list is empty");
                 }
-                rwLock.readLock().lock();
+                addrList = provider;
+                cacheMap.put(interfaceName, provider);
+                registry.watchInterface(interfaceName, event -> {
+                    rwLock.writeLock().lock();
+                    try {
+                        try {
+                            cacheMap.put(interfaceName, registry.getProvider(interfaceName));
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    } finally {
+                        rwLock.writeLock().unlock();
+                    }
+                });
             }
             //先将lb写死在这里
             int index = ThreadLocalRandom.current().nextInt(0, addrList.size());
             return addrList.get(index);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         } finally {
-            rwLock.readLock().unlock();
+            rwLock.writeLock().unlock();
         }
-
     }
 
-
     public void removeProvider(String interfaceName, String providerAddr) {
-        rwLock.writeLock().unlock();
+        rwLock.writeLock().lock();
         try {
             cacheMap.get(interfaceName).remove(providerAddr);
         } finally {

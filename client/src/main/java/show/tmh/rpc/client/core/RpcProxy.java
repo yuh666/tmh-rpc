@@ -45,6 +45,7 @@ public class RpcProxy implements InvocationHandler {
                 response = future.get();
             }
             if (response.getResponseCode() == 1) {
+                System.out.println("优雅");
                 registryCache.removeProvider(interfaceName, addr);
             }
             return response.getResult();
