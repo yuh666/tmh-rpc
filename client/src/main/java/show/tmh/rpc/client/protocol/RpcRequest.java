@@ -14,6 +14,7 @@ public class RpcRequest implements Serializable {
     private Long requestId;
     private String interfaceName;
     private Integer methodCode;
+    private Long expectTimeOut;
     private Object[] args;
 
     public RpcRequest() {

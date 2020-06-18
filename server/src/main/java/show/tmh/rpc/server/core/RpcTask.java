@@ -21,15 +21,22 @@ public class RpcTask implements Runnable {
 
     private RpcRequest request;
     private ChannelHandlerContext ctx;
+    private long addTime;
 
     @Override
     public void run() {
+        if (System.currentTimeMillis() - addTime > request.getExpectTimeOut()) {
+            //超时 直接丢弃
+            return;
+        }
         Method methodHandle =
-                ServerRegistry.INSTANCE.getMethod(request.getInterfaceName(), request.getMethodCode());
+                ServerRegistry.INSTANCE.getMethod(request.getInterfaceName(),
+                        request.getMethodCode());
         RpcResponse rpcResponse = new RpcResponse();
         rpcResponse.setResponseId(request.getRequestId());
         if (methodHandle == null) {
-            rpcResponse.setThrowable(new Exception(request.getInterfaceName() + "#" + request.getMethodCode() + "Not Found!"));
+            rpcResponse.setThrowable(new Exception(
+                    request.getInterfaceName() + "#" + request.getMethodCode() + "Not Found!"));
             ctx.channel().writeAndFlush(rpcResponse);
             return;
         }
