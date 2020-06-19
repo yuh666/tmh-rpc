@@ -22,6 +22,7 @@ public class NettyServer {
     private final ServerBootstrap bootstrap = new ServerBootstrap();
     private final EventLoopGroup bossGroup = new NioEventLoopGroup(1);
     private final EventLoopGroup workerGroup = new NioEventLoopGroup(2);
+    private NettyServerHandler serverHandler = new NettyServerHandler();
     private final ConcurrentMap<String, Channel> channelTables = new ConcurrentHashMap<>();
 
     private final String host;
@@ -32,7 +33,6 @@ public class NettyServer {
         this.host = host;
         this.port = port;
         NettyExceptionHandler exceptionHandler = new NettyExceptionHandler();
-        NettyServerHandler nettyServerHandler = new NettyServerHandler();
         this.bootstrap.group(this.bossGroup, this.workerGroup)
                 .channel(NioServerSocketChannel.class)
                 .option(ChannelOption.SO_BACKLOG, 1024)
@@ -46,7 +46,7 @@ public class NettyServer {
                                 .addLast(
                                         new NettyEncoder(),
                                         new NettyDecoder(),
-                                        nettyServerHandler,
+                                        serverHandler,
                                         exceptionHandler
                                 );
                     }
@@ -65,6 +65,7 @@ public class NettyServer {
     public void shutdown() {
         this.bossGroup.shutdownGracefully();
         this.workerGroup.shutdownGracefully();
+        serverHandler.shutdown();
     }
 
 }

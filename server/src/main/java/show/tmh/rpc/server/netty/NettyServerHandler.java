@@ -39,4 +39,8 @@ public class NettyServerHandler extends SimpleChannelInboundHandler<RpcRequest> 
             ctx.channel().writeAndFlush(rpcResponse);
         }
     }
+
+    public void shutdown(){
+        this.service.shutdown();
+    }
 }
