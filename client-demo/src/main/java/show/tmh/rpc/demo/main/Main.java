@@ -21,7 +21,7 @@ public class Main {
             executorService.execute(new Runnable() {
                 @Override
                 public void run() {
-                    for (int j = 0; j < 100000; j++) {
+                    for (int j = 0; j < 10; j++) {
                         User user = userService.get(1L);
                         try {
                             Thread.sleep(100);
